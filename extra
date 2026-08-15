@@ -1,0 +1,26 @@
+local constructorrules = {
+	BodyVelocity = {
+		replace = "LinearVelocity",
+		note = "LinearVelocity is the modern replacement.",	
+	},
+	BodyGyro = {
+		replace = "AlignOrientation",
+		note = "AlignOrientation is the modern replacement.",
+	},
+	BodyPosition = {
+		replace = "AlignPosition",
+		note = "AlignPosition is the modern replacement.",
+	},
+	BodyAngularVelocity = {
+		replace = "AngularVelocity",
+		note = "AngularVelocity is the modern replacement.",
+	},
+	BodyForce = {
+		replace = "VectorForce",
+		note = "VectorForce is the modern replacement.",
+	},
+	BodyThrust = {
+		replace = "VectorForce",
+		note = "VectorForce is the modern replacement.",
+	},
+}
