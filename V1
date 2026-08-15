@@ -1,0 +1,492 @@
+local replacements = {
+	{
+		pattern = ".Velocity",
+		replace = ".AssemblyLinearVelocity",
+		kind = "member",
+		note = "BasePart.Velocity is deprecated. AssemblyLinearVelocity is the assembly's linear velocity. Verify behavior when the part belongs to a welded assembly.",
+	},
+
+	{
+		pattern = ".RotVelocity",
+		replace = ".AssemblyAngularVelocity",
+		kind = "member",
+		note = "BasePart.RotVelocity is deprecated. Use AssemblyAngularVelocity.",
+	},
+
+	{
+		pattern = ".CollisionGroupId",
+		replace = ".CollisionGroup",
+		kind = "manual",
+		note = "BasePart.CollisionGroupId is deprecated. CollisionGroup now uses the collision group name string. This is not a safe mechanical replacement because the value type changes from number to string.",
+	},
+
+	{
+		pattern = ".Elasticity",
+		replace = ".CustomPhysicalProperties",
+		kind = "manual",
+		note = "BasePart.Elasticity is deprecated. Use CustomPhysicalProperties with PhysicalProperties.new(...) instead. Not a 1:1 replacement.",
+	},
+
+	{
+		pattern = ".Friction",
+		replace = ".CustomPhysicalProperties",
+		kind = "manual",
+		note = "BasePart.Friction is deprecated. Use CustomPhysicalProperties with PhysicalProperties.new(...) instead. Not a 1:1 replacement.",
+	},
+
+	{
+		pattern = ".SpecificGravity",
+		replace = ".CustomPhysicalProperties",
+		kind = "manual",
+		note = "BasePart.SpecificGravity is deprecated. Use CustomPhysicalProperties / PhysicalProperties instead.",
+	},
+
+	{
+		pattern = ".brickColor",
+		replace = ".BrickColor",
+		kind = "member",
+		note = "Legacy lowercase BasePart.brickColor is deprecated. Use BrickColor.",
+	},
+
+
+	{
+		pattern = ":SetPrimaryPartCFrame(",
+		replace = ":PivotTo(",
+		kind = "manual",
+		note = "SetPrimaryPartCFrame is deprecated. PivotTo is the modern replacement. CFrame semantics are similar, but PivotTo does not require PrimaryPart.",
+	},
+
+	{
+		pattern = ":GetPrimaryPartCFrame(",
+		replace = ":GetPivot(",
+		kind = "member",
+		note = "GetPrimaryPartCFrame is deprecated. GetPivot returns the model's current pivot CFrame.",
+	},
+
+	{
+		pattern = ":GetModelCFrame(",
+		replace = ":GetPivot(",
+		kind = "member",
+		note = "Model:GetModelCFrame is deprecated. GetPivot is the modern replacement.",
+	},
+
+	{
+		pattern = ":GetModelSize(",
+		replace = ":GetExtentsSize(",
+		kind = "member",
+		note = "Model:GetModelSize is deprecated. GetExtentsSize is the closest modern replacement.",
+	},
+
+	{
+		pattern = ":moveTo(",
+		replace = ":MoveTo(",
+		kind = "member",
+		note = "Legacy lowercase Model:moveTo is deprecated. Use MoveTo.",
+	},
+
+	{
+		pattern = ":move(",
+		replace = ":MoveTo(",
+		kind = "manual",
+		note = "Legacy lowercase Model:move is deprecated, but move and MoveTo are not necessarily semantically identical. Manual review recommended.",
+	},
+
+	{
+		pattern = ":BreakJoints(",
+		replace = ":BreakJoints(",
+		kind = "manual",
+		note = "Model:BreakJoints is deprecated. There is no direct drop-in replacement for every use case; inspect the joint setup and intended behavior.",
+	},
+
+	{
+		pattern = ":breakJoints(",
+		replace = ":BreakJoints(",
+		kind = "manual",
+		note = "Legacy lowercase breakJoints is deprecated. BreakJoints itself is also deprecated; flagged for manual review.",
+	},
+
+	{
+		pattern = ":MakeJoints(",
+		replace = ":MakeJoints(",
+		kind = "manual",
+		note = "Model:MakeJoints is deprecated. No general safe 1:1 source replacement.",
+	},
+
+	{
+		pattern = ":makeJoints(",
+		replace = ":MakeJoints(",
+		kind = "manual",
+		note = "Legacy lowercase makeJoints is deprecated; the uppercase API is also deprecated. Manual review required.",
+	},
+
+
+	{
+		pattern = ":FindPartOnRay(",
+		replace = ":Raycast(",
+		kind = "manual",
+		note = "FindPartOnRay is deprecated. Raycast uses origin + direction + optional RaycastParams and returns a RaycastResult, so this requires manual rewriting.",
+	},
+
+	{
+		pattern = ":FindPartOnRayWithIgnoreList(",
+		replace = ":Raycast(",
+		kind = "manual",
+		note = "FindPartOnRayWithIgnoreList is deprecated. Replace with Raycast + RaycastParams.FilterDescendantsInstances.",
+	},
+
+	{
+		pattern = ":FindPartOnRayWithWhitelist(",
+		replace = ":Raycast(",
+		kind = "manual",
+		note = "FindPartOnRayWithWhitelist is deprecated. Replace with Raycast + RaycastParams.FilterType/FilterDescendantsInstances.",
+	},
+
+	{
+		pattern = ":FindPartsInRegion3(",
+		replace = ":GetPartBoundsInBox(",
+		kind = "manual",
+		note = "FindPartsInRegion3 is deprecated. GetPartBoundsInBox uses CFrame + Size and has different filtering/return semantics.",
+	},
+
+	{
+		pattern = ":FindPartsInRegion3WithIgnoreList(",
+		replace = ":GetPartBoundsInBox(",
+		kind = "manual",
+		note = "FindPartsInRegion3WithIgnoreList is deprecated. Requires a manual rewrite using OverlapParams.",
+	},
+
+	{
+		pattern = ":FindPartsInRegion3WithWhiteList(",
+		replace = ":GetPartBoundsInBox(",
+		kind = "manual",
+		note = "FindPartsInRegion3WithWhiteList is deprecated. Requires a manual rewrite using OverlapParams.",
+	},
+
+	{
+		pattern = ":IsRegion3Empty(",
+		replace = ":GetPartBoundsInBox(",
+		kind = "manual",
+		note = "Region3 query API is deprecated. Use GetPartBoundsInBox/GetPartBoundsInRadius with OverlapParams.",
+	},
+
+
+	{
+		pattern = ":LoadAnimation(",
+		replace = ":LoadAnimation(",
+		kind = "manual",
+		note = "Humanoid:LoadAnimation is deprecated. Use Animator:LoadAnimation() with a reference to the Animator.",
+	},
+
+	{
+		pattern = ":PlayEmote(",
+		replace = ":PlayEmoteAsync(",
+		kind = "manual",
+		note = "Humanoid:PlayEmote is deprecated. PlayEmoteAsync is the modern replacement and yields, so review call-site behavior.",
+	},
+
+	{
+		pattern = ":takeDamage(",
+		replace = ":TakeDamage(",
+		kind = "member",
+		note = "Legacy lowercase Humanoid:takeDamage is deprecated. Use TakeDamage.",
+	},
+
+	{
+		pattern = ":TakeDamage(",
+		replace = ":TakeDamage(",
+		kind = "skip",
+		note = "TakeDamage is current and should not be changed.",
+	},
+
+	{
+		pattern = "AnimationController:LoadAnimation(",
+		replace = "Animator:LoadAnimation(",
+		kind = "manual",
+		note = "AnimationController:LoadAnimation is deprecated. Load animations directly through an Animator.",
+	},
+
+	{
+		pattern = "AnimationController:GetPlayingAnimationTracks(",
+		replace = "Animator:GetPlayingAnimationTracks(",
+		kind = "manual",
+		note = "AnimationController:GetPlayingAnimationTracks is deprecated. Use Animator:GetPlayingAnimationTracks().",
+	},
+
+
+	{
+		pattern = ":children(",
+		replace = ":GetChildren(",
+		kind = "member",
+		note = "Legacy lowercase Instance:children is deprecated. Use GetChildren.",
+	},
+
+	{
+		pattern = ":clone(",
+		replace = ":Clone(",
+		kind = "member",
+		note = "Legacy lowercase Instance:clone is deprecated. Use Clone.",
+	},
+
+	{
+		pattern = ":destroy(",
+		replace = ":Destroy(",
+		kind = "member",
+		note = "Legacy lowercase Instance:destroy is deprecated. Use Destroy.",
+	},
+
+	{
+		pattern = ":findFirstChild(",
+		replace = ":FindFirstChild(",
+		kind = "member",
+		note = "Legacy lowercase Instance:findFirstChild is deprecated. Use FindFirstChild.",
+	},
+
+	{
+		pattern = ":isDescendantOf(",
+		replace = ":IsDescendantOf(",
+		kind = "member",
+		note = "Legacy lowercase Instance:isDescendantOf is deprecated. Use IsDescendantOf.",
+	},
+
+	{
+		pattern = ".childAdded",
+		replace = ".ChildAdded",
+		kind = "member",
+		note = "Legacy lowercase childAdded event is deprecated. Use ChildAdded.",
+	},
+
+	{
+		pattern = ".childRemoved",
+		replace = ".ChildRemoved",
+		kind = "member",
+		note = "Legacy lowercase childRemoved event is deprecated. Use ChildRemoved.",
+	},
+
+	{
+		pattern = ".archivable",
+		replace = ".Archivable",
+		kind = "member",
+		note = "Legacy lowercase archivable property is deprecated. Use Archivable.",
+	},
+
+
+	{
+		pattern = ":getMass(",
+		replace = ":GetMass(",
+		kind = "member",
+		note = "Legacy lowercase BasePart:getMass is deprecated. Use GetMass or AssemblyMass depending on whether you need the part's legacy mass API or entire assembly mass.",
+	},
+
+	{
+		pattern = ":GetMass(",
+		replace = ":GetMass(",
+		kind = "skip",
+		note = "GetMass itself is still available. Do not blindly replace it; AssemblyMass is a different API and returns assembly mass.",
+	},
+
+	{
+		pattern = ":getRenderCFrame(",
+		replace = ":GetRenderCFrame(",
+		kind = "manual",
+		note = "Legacy GetRenderCFrame API is deprecated. Modern rendering/physics code generally should use CFrame or the appropriate assembly/pivot APIs depending on intent.",
+	},
+
+	{
+		pattern = ":getRootPart(",
+		replace = ":GetRootPart(",
+		kind = "manual",
+		note = "GetRootPart is deprecated. Use AssemblyRootPart where appropriate.",
+	},
+
+
+	{
+		pattern = ".RenderStepped:Connect(",
+		replace = ".PreRender:Connect(",
+		kind = "manual",
+		note = "RenderStepped is legacy. PreRender is the modern render-stage event. Verify client-only usage and timing requirements.",
+	},
+
+	{
+		pattern = ".Stepped:Connect(",
+		replace = ".PreSimulation:Connect(",
+		kind = "manual",
+		note = "Stepped is legacy. PreSimulation is the modern simulation-stage event. The callback arguments differ: Stepped provides time and deltaTime, while PreSimulation provides deltaTime.",
+	},
+
+
+	{
+		pattern = ".KeyDown:Connect(",
+		replace = ".KeyDown:Connect(",
+		kind = "manual",
+		note = "Mouse.KeyDown is deprecated. Use UserInputService.InputBegan or ContextActionService.",
+	},
+
+	{
+		pattern = ".KeyUp:Connect(",
+		replace = ".KeyUp:Connect(",
+		kind = "manual",
+		note = "Mouse.KeyUp is deprecated. Use UserInputService.InputEnded or ContextActionService.",
+	},
+
+	{
+		pattern = ".hit",
+		replace = ".Hit",
+		kind = "member",
+		note = "Legacy lowercase Mouse.hit is deprecated. Use Hit where legacy Mouse access is still intentionally being used.",
+	},
+
+	{
+		pattern = ".target",
+		replace = ".Target",
+		kind = "member",
+		note = "Legacy lowercase Mouse.target is deprecated. Use Target where legacy Mouse access is still intentionally being used.",
+	},
+
+	{
+		pattern = ":GetMouse()",
+		replace = ":GetMouse()",
+		kind = "manual",
+		note = "Mouse is a legacy input API. Prefer UserInputService/ContextActionService, but this requires restructuring rather than a textual replacement.",
+	},
+
+
+	{
+		pattern = "wait(",
+		replace = "task.wait(",
+		kind = "global",
+		note = "Legacy wait() is deprecated. Use task.wait().",
+	},
+
+	{
+		pattern = "spawn(",
+		replace = "task.spawn(",
+		kind = "global",
+		note = "Legacy spawn() is deprecated. Use task.spawn(). This changes scheduling behavior; review if timing matters.",
+	},
+
+	{
+		pattern = "delay(",
+		replace = "task.delay(",
+		kind = "global",
+		note = "Legacy delay() is deprecated. Use task.delay().",
+	},
+
+	{
+		pattern = "coroutine.wrap(",
+		replace = "coroutine.wrap(",
+		kind = "skip",
+		note = "Not deprecated. Do not replace with task.spawn automatically because coroutine semantics differ.",
+	},
+
+	{
+		pattern = "tick(",
+		replace = "time(",
+		kind = "manual",
+		note = "tick() is not formally deprecated, but Roblox documents significant issues and recommends os.time(), os.clock(), time(), or DateTime Unix timestamps depending on the intended measurement. Do not blindly replace.",
+	},
+
+
+	{
+		pattern = ":components(",
+		replace = ":GetComponents(",
+		kind = "member",
+		note = "Legacy lowercase CFrame:components is deprecated. Use GetComponents.",
+	},
+
+
+	{
+		pattern = ":toHSV(",
+		replace = ":ToHSV(",
+		kind = "member",
+		note = "Legacy lowercase Color3:toHSV is deprecated. Use ToHSV.",
+	},
+
+
+	{
+		pattern = ".BackgroundColor",
+		replace = ".BackgroundColor3",
+		kind = "member",
+		note = "GuiObject.BackgroundColor is deprecated. Use BackgroundColor3. Verify that the receiver is a GuiObject and that a Color3 value is intended.",
+	},
+
+	{
+		pattern = ".BorderColor",
+		replace = ".BorderColor3",
+		kind = "member",
+		note = "GuiObject.BorderColor is deprecated. Use BorderColor3. Verify that the receiver is a GuiObject.",
+	},
+
+	{
+		pattern = ".Color",
+		replace = ".Color3",
+		kind = "manual",
+		note = "Some GuiBase3d classes have deprecated BrickColor Color properties in favor of Color3. Do not globally replace '.Color' because BasePart.Color and many other Color properties are current.",
+	},
+
+
+	{
+		pattern = ".SurfaceColor",
+		replace = ".SurfaceColor3",
+		kind = "member",
+		note = "SelectionSphere.SurfaceColor is deprecated. Use SurfaceColor3.",
+	},
+
+	{
+		pattern = ".Color",
+		replace = ".Color3",
+		kind = "manual",
+		note = "GuiBase3d.Color is deprecated in favor of Color3, but '.Color' is also valid/current on many other classes. Requires class-aware matching.",
+	},
+
+
+	{
+		pattern = ":OnUpdate(",
+		replace = ":OnUpdate(",
+		kind = "manual",
+		note = "GlobalDataStore:OnUpdate is deprecated. There is no direct callback replacement; redesign around GetAsync/UpdateAsync and explicit synchronization.",
+	},
+
+
+	{
+		pattern = ":loadAnimation(",
+		replace = ":LoadAnimation(",
+		kind = "manual",
+		note = "Legacy lowercase Humanoid:loadAnimation is deprecated, and Humanoid:LoadAnimation itself is deprecated in favor of Animator:LoadAnimation.",
+	},
+
+
+	{
+		pattern = ".PlatformStand",
+		replace = ".PlatformStand",
+		kind = "skip",
+		note = "Not deprecated.",
+	},
+
+	{
+		pattern = ":ScreenPointToRay(",
+		replace = ":ScreenPointToRay(",
+		kind = "skip",
+		note = "Not deprecated.",
+	},
+
+	{
+		pattern = ":ViewportPointToRay(",
+		replace = ":ViewportPointToRay(",
+		kind = "skip",
+		note = "Not deprecated.",
+	},
+
+	{
+		pattern = ":IsClient(",
+		replace = ":IsClient(",
+		kind = "skip",
+		note = "Not deprecated.",
+	},
+
+	{
+		pattern = ":IsServer(",
+		replace = ":IsServer(",
+		kind = "skip",
+		note = "Not deprecated.",
+	},
+}
